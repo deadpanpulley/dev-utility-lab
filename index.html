@@ -1,0 +1,74 @@
+Exit code: 0
+Wall time: 0.9 seconds
+Output:
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A private, browser-based workspace for formatting, validating, searching, and converting JSON." />
+    <title>Dev Utility Lab â€” JSON Workspace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <a class="brand" href="#top" aria-label="Dev Utility Lab home"><span>â—†</span> DEV UTILITY LAB</a>
+        <p class="eyebrow">JSON WORKSPACE <span>â€¢</span> DATA STAYS ON YOUR DEVICE</p>
+        <h1>Make messy JSON<br /><em>make sense.</em></h1>
+        <p class="intro">Format, validate, search, compare-ready export, and turn JSON arrays into CSV â€” without sending your data anywhere.</p>
+      </header>
+
+      <section class="workspace" aria-label="JSON editor">
+        <div class="toolbar">
+          <div class="status"><span id="status-dot"></span><span id="status">Ready for JSON</span></div>
+          <div class="actions">
+            <button class="text-button" id="sample">Load sample</button>
+            <button class="text-button danger" id="clear">Clear</button>
+          </div>
+        </div>
+        <label class="sr-only" for="input">Paste JSON input</label>
+        <textarea id="input" spellcheck="false" placeholder='Paste JSON hereâ€¦\n\nExample: {"project":"hello","active":true}'></textarea>
+        <div class="command-bar">
+          <button id="format" class="primary">Format JSON <kbd>âŒ˜â†µ</kbd></button>
+          <button id="minify">Minify</button>
+          <button id="validate">Validate</button>
+          <div class="command-spacer"></div>
+          <button id="copy">Copy</button>
+          <button id="download">Download</button>
+          <button id="csv">JSON â†’ CSV</button>
+        </div>
+      </section>
+
+      <section class="tools" aria-label="JSON tools">
+        <article class="tool-card">
+          <p class="card-number">01</p>
+          <h2>Find anything</h2>
+          <p>Search keys and values in the current JSON. Matches are counted instantly.</p>
+          <label class="search-box" for="search"><span>âŒ•</span><input id="search" placeholder="Search JSONâ€¦" /><b id="matches">0</b></label>
+        </article>
+        <article class="tool-card privacy-card">
+          <p class="card-number">02</p>
+          <h2>Actually private</h2>
+          <p>Your JSON never leaves this browser. There is no account, analytics, or upload step.</p>
+          <div class="privacy-note"><span>âœ“</span> Local-only processing</div>
+        </article>
+        <article class="tool-card">
+          <p class="card-number">03</p>
+          <h2>Shortcut-friendly</h2>
+          <p><kbd>âŒ˜â†µ</kbd> formats JSON. Replace it with <kbd>Ctrlâ†µ</kbd> on Windows or Linux.</p>
+        </article>
+      </section>
+
+      <footer>
+        <span>BUILT IN PUBLIC Â· <span id="year"></span></span>
+        <span>NO SERVER. NO TRACKING. JUST TOOLS.</span>
+      </footer>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
+
