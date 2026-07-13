@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="A private, browser-based workspace for formatting, validating, redacting, searching, and converting JSON." />
+    <meta name="description" content="A private, browser-based workspace for formatting, validating, redacting, searching, and converting JSON and CSV." />
     <title>Dev Utility Lab — JSON Workspace</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -37,6 +37,11 @@
           <button id="copy">Copy</button>
           <button id="download">Download</button>
           <button id="csv">JSON → CSV</button>
+        </div>
+        <div class="csv-import-bar">
+          <span>Paste CSV into the editor, then select</span>
+          <button id="csv-to-json" type="button">CSV to JSON</button>
+          <span>to use its first row as headers.</span>
         </div>
         <div class="redact-bar">
           <label for="redact-fields">Sensitive field names <span>(comma-separated)</span></label>
