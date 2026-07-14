@@ -4,7 +4,7 @@ const sample = { user: { id: 42, name: 'Avery Kim', role: 'developer' }, project
 
 function setStatus(message, kind = '') { status.textContent = message; dot.className = kind; }
 function parse() { try { return { value: JSON.parse(input.value) }; } catch (error) { const message = error.message.replace(/^Unexpected token/, 'Invalid character'); setStatus(message, 'error'); return { error }; } }
-function output(value, spacing = 2) { input.value = JSON.stringify(value, null, spacing); setStatus('Valid JSON', 'ok'); updateMatches(); }
+function output(value, spacing = 2) { input.value = JSON.stringify(value, null, spacing); setStatus('Valid JSON', 'ok'); updateMatches(); updatePaths(value); }
 function download(content, name, type) { const url = URL.createObjectURL(new Blob([content], { type })); const link = document.createElement('a'); link.href = url; link.download = name; link.click(); URL.revokeObjectURL(url); }
 function parseCsv(text) {
   const rows = [];
@@ -43,11 +43,34 @@ function csvToJson(text) {
   if (rows.slice(1).some((row) => row.length !== headers.length)) throw new Error('Each CSV row must have the same number of cells as the header');
   return rows.slice(1).map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index]])));
 }
+function jsonPathSegment(key) { return /^[A-Za-z_$][\w$]*$/.test(key) ? `.${key}` : `[${JSON.stringify(key)}]`; }
+function collectJsonPaths(value, path = '$', paths = []) {
+  if (Array.isArray(value)) value.forEach((item, index) => { const itemPath = `${path}[${index}]`; paths.push({ path: itemPath, value: item }); collectJsonPaths(item, itemPath, paths); });
+  else if (value && typeof value === 'object') Object.entries(value).forEach(([key, item]) => { const itemPath = `${path}${jsonPathSegment(key)}`; paths.push({ path: itemPath, value: item }); collectJsonPaths(item, itemPath, paths); });
+  return paths;
+}
+function pathPreview(value) { if (value && typeof value === 'object') return Array.isArray(value) ? `[${value.length} item${value.length === 1 ? '' : 's'}]` : '{...}'; return String(value); }
+function updatePaths(value) {
+  const results = $('path-results'); const count = $('path-count');
+  if (value === undefined) { results.textContent = 'Format valid JSON to explore paths.'; count.textContent = '0'; return; }
+  const query = $('path-search').value.trim().toLowerCase();
+  const paths = collectJsonPaths(value).filter(({ path, value: item }) => !query || `${path} ${pathPreview(item)}`.toLowerCase().includes(query));
+  count.textContent = paths.length; results.replaceChildren();
+  if (!paths.length) { results.textContent = query ? 'No matching paths.' : 'This JSON has no nested paths.'; return; }
+  paths.slice(0, 40).forEach(({ path, value: item }) => {
+    const button = document.createElement('button'); button.type = 'button'; button.className = 'path-result'; button.title = `Copy ${path}`;
+    const code = document.createElement('code'); code.textContent = path;
+    const preview = document.createElement('span'); preview.textContent = pathPreview(item);
+    button.append(code, preview); button.onclick = async () => { try { await navigator.clipboard.writeText(path); setStatus(`Copied ${path}`, 'ok'); } catch { setStatus('Clipboard access was unavailable', 'error'); } };
+    results.append(button);
+  });
+  if (paths.length > 40) { const more = document.createElement('p'); more.textContent = `Showing first 40 of ${paths.length} paths. Refine the filter.`; results.append(more); }
+}
 
 $('format').onclick = () => { const { value } = parse(); if (value !== undefined) output(value); };
 $('minify').onclick = () => { const { value } = parse(); if (value !== undefined) output(value, 0); };
 $('validate').onclick = () => { const { value } = parse(); if (value !== undefined) setStatus(`Valid JSON · ${Array.isArray(value) ? value.length + ' items' : 'object ready'}`, 'ok'); };
-$('clear').onclick = () => { input.value = ''; $('search').value = ''; setStatus('Ready for JSON'); updateMatches(); input.focus(); };
+$('clear').onclick = () => { input.value = ''; $('search').value = ''; setStatus('Ready for JSON'); updateMatches(); updatePaths(); input.focus(); };
 $('sample').onclick = () => output(sample);
 $('copy').onclick = async () => { if (!input.value.trim()) return setStatus('Nothing to copy', 'error'); try { await navigator.clipboard.writeText(input.value); setStatus('Copied to clipboard', 'ok'); } catch { setStatus('Clipboard access was unavailable', 'error'); } };
 $('download').onclick = () => { const { value } = parse(); if (value !== undefined) { download(JSON.stringify(value, null, 2), 'data.json', 'application/json'); setStatus('Downloaded data.json', 'ok'); } };
@@ -81,3 +104,4 @@ function updateMatches() { const q = $('search').value.trim().toLowerCase(); con
 $('search').oninput = updateMatches; input.oninput = () => { setStatus('Editing…'); updateMatches(); };
 input.onkeydown = (event) => { if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) { event.preventDefault(); $('format').click(); } };
 $('year').textContent = new Date().getFullYear();
+$('path-search').oninput = () => { const { value } = parse(); if (value !== undefined) updatePaths(value); };

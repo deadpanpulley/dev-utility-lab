@@ -65,8 +65,10 @@
         </article>
         <article class="tool-card">
           <p class="card-number">03</p>
-          <h2>Shortcut-friendly</h2>
-          <p><kbd>⌘↵</kbd> formats JSON. Replace it with <kbd>Ctrl↵</kbd> on Windows or Linux.</p>
+          <h2>Explore paths</h2>
+          <p>Find copyable JSON paths for keys and values, including array items.</p>
+          <label class="search-box" for="path-search"><span>⌕</span><input id="path-search" placeholder="Filter paths…" /><b id="path-count">0</b></label>
+          <div class="path-results" id="path-results" aria-live="polite" aria-label="JSON path results">Format valid JSON to explore paths.</div>
         </article>
       </section>
 

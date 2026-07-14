@@ -7,6 +7,7 @@ A privacy-first, browser-only JSON workspace. It is a portfolio project built in
 - Format and minify JSON
 - Validate JSON with clear status feedback
 - Search keys and values
+- Explore and copy JSON paths, with safe bracket notation for unusual keys
 - Redact sensitive fields at any nesting level before sharing
 - Copy or download JSON
 - Convert an array of objects to CSV
@@ -20,6 +21,10 @@ Enter comma-separated field names (for example, `password, token, secret, apiKey
 
 Paste CSV into the editor and select **CSV to JSON**. The first non-empty row is always treated as the header row: headers are trimmed, must be non-empty and unique, and every data row must have the same number of cells. Quoted cells, escaped quotes, commas, and line breaks inside quoted cells are supported. CSV values are preserved as strings so identifiers such as `00123` are not changed.
 
+## Exploring JSON paths
+
+Format, minify, load the sample, or convert CSV to JSON, then use **Explore paths** to browse every nested key and array item. Filter by a path or displayed value and select a result to copy its JSON path. Keys that cannot use dot notation are safely represented with brackets, such as `$["build-id"]`.
+
 ## Run locally
 
 This first release is dependency-free. Open `index.html` in a browser, or serve the folder with any static-file server.
@@ -32,7 +37,7 @@ npx serve .
 
 - [ ] JSON diff view
 - [x] Redact sensitive fields before sharing
-- [ ] JSON path explorer
+- [x] JSON path explorer
 - [x] CSV-to-JSON conversion
 - [ ] Saved local workspaces
 
