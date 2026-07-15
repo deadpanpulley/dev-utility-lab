@@ -8,6 +8,7 @@ A privacy-first, browser-only JSON workspace. It is a portfolio project built in
 - Validate JSON with clear status feedback
 - Search keys and values
 - Explore and copy JSON paths, with safe bracket notation for unusual keys
+- Compare two JSON documents with added, removed, and changed paths
 - Redact sensitive fields at any nesting level before sharing
 - Copy or download JSON
 - Convert an array of objects to CSV
@@ -25,6 +26,10 @@ Paste CSV into the editor and select **CSV to JSON**. The first non-empty row is
 
 Format, minify, load the sample, or convert CSV to JSON, then use **Explore paths** to browse every nested key and array item. Filter by a path or displayed value and select a result to copy its JSON path. Keys that cannot use dot notation are safely represented with brackets, such as `$["build-id"]`.
 
+## Comparing JSON
+
+Paste one JSON document into the main editor and another into the **JSON diff** panel, then select **Compare JSON**. The local diff lists each added, removed, or changed path and shows a compact value preview. Comparison does not alter either document.
+
 ## Run locally
 
 This first release is dependency-free. Open `index.html` in a browser, or serve the folder with any static-file server.
@@ -35,7 +40,7 @@ npx serve .
 
 ## Roadmap
 
-- [ ] JSON diff view
+- [x] JSON diff view
 - [x] Redact sensitive fields before sharing
 - [x] JSON path explorer
 - [x] CSV-to-JSON conversion

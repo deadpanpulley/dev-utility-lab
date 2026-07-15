@@ -50,6 +50,21 @@ function collectJsonPaths(value, path = '$', paths = []) {
   return paths;
 }
 function pathPreview(value) { if (value && typeof value === 'object') return Array.isArray(value) ? `[${value.length} item${value.length === 1 ? '' : 's'}]` : '{...}'; return String(value); }
+function valuePreview(value) { const text = JSON.stringify(value); return text === undefined ? String(value) : text.length > 120 ? `${text.slice(0, 117)}...` : text; }
+function diffJson(before, after, path = '$', changes = []) {
+  if (Object.is(before, after)) return changes;
+  const beforeObject = before && typeof before === 'object'; const afterObject = after && typeof after === 'object';
+  if (!beforeObject || !afterObject || Array.isArray(before) !== Array.isArray(after)) { changes.push({ kind: 'changed', path, before, after }); return changes; }
+  const keys = Array.isArray(before) ? Array.from({ length: Math.max(before.length, after.length) }, (_, index) => index) : [...new Set([...Object.keys(before), ...Object.keys(after)])];
+  keys.forEach((key) => { const itemPath = Array.isArray(before) ? `${path}[${key}]` : `${path}${jsonPathSegment(key)}`; if (!Object.hasOwn(before, key)) changes.push({ kind: 'added', path: itemPath, after: after[key] }); else if (!Object.hasOwn(after, key)) changes.push({ kind: 'removed', path: itemPath, before: before[key] }); else diffJson(before[key], after[key], itemPath, changes); });
+  return changes;
+}
+function renderDiff(changes) {
+  const results = $('diff-results'); results.replaceChildren();
+  if (!changes.length) { results.textContent = 'No differences found.'; $('diff-summary').textContent = 'The documents are identical.'; return; }
+  const totals = changes.reduce((counts, { kind }) => ({ ...counts, [kind]: counts[kind] + 1 }), { added: 0, removed: 0, changed: 0 }); $('diff-summary').textContent = `${changes.length} difference${changes.length === 1 ? '' : 's'}: ${totals.added} added, ${totals.removed} removed, ${totals.changed} changed.`;
+  changes.forEach((change) => { const row = document.createElement('div'); row.className = `diff-result ${change.kind}`; const kind = document.createElement('span'); kind.className = 'diff-kind'; kind.textContent = change.kind; const body = document.createElement('div'); const code = document.createElement('code'); code.textContent = change.path; const detail = document.createElement('div'); detail.className = 'diff-detail'; detail.textContent = change.kind === 'changed' ? `${valuePreview(change.before)} → ${valuePreview(change.after)}` : valuePreview(change.kind === 'added' ? change.after : change.before); body.append(code, detail); row.append(kind, body); results.append(row); });
+}
 function updatePaths(value) {
   const results = $('path-results'); const count = $('path-count');
   if (value === undefined) { results.textContent = 'Format valid JSON to explore paths.'; count.textContent = '0'; return; }
@@ -99,6 +114,11 @@ $('redact').onclick = () => {
   };
   output(redactValue(value));
   setStatus(count ? `Redacted ${count} field${count === 1 ? '' : 's'}` : 'No matching fields found', count ? 'ok' : '');
+};
+$('compare').onclick = () => {
+  if (!input.value.trim() || !$('diff-input').value.trim()) { $('diff-summary').textContent = 'Paste JSON in both editors first.'; return; }
+  try { renderDiff(diffJson(JSON.parse(input.value), JSON.parse($('diff-input').value))); setStatus('Compared two JSON documents', 'ok'); }
+  catch (error) { $('diff-summary').textContent = `Cannot compare: ${error.message}`; setStatus('JSON comparison needs valid input', 'error'); }
 };
 function updateMatches() { const q = $('search').value.trim().toLowerCase(); const text = input.value.toLowerCase(); const count = q ? text.split(q).length - 1 : 0; $('matches').textContent = count; }
 $('search').oninput = updateMatches; input.oninput = () => { setStatus('Editing…'); updateMatches(); };

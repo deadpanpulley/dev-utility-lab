@@ -48,6 +48,13 @@
           <input id="redact-fields" value="password, token, secret, apiKey" spellcheck="false" />
           <button id="redact" type="button">Redact fields</button>
         </div>
+        <div class="diff-panel" aria-labelledby="diff-title">
+          <div><p class="diff-kicker">JSON DIFF</p><h2 id="diff-title">Compare against another JSON document</h2><p>Paste a second document and find exactly what was added, removed, or changed.</p></div>
+          <label class="sr-only" for="diff-input">JSON to compare</label>
+          <textarea id="diff-input" class="diff-input" spellcheck="false" placeholder="Paste JSON to compare…"></textarea>
+          <div class="diff-actions"><button id="compare" type="button">Compare JSON</button><span id="diff-summary" aria-live="polite">Paste two JSON documents to compare.</span></div>
+          <div class="diff-results" id="diff-results" aria-live="polite"></div>
+        </div>
       </section>
 
       <section class="tools" aria-label="JSON tools">
