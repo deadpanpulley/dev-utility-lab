@@ -1,11 +1,28 @@
 const $ = (id) => document.getElementById(id);
 const input = $('input'); const status = $('status'); const dot = $('status-dot');
 const sample = { user: { id: 42, name: 'Avery Kim', role: 'developer' }, projects: [{ name: 'Dev Utility Lab', status: 'building', stars: 0 }, { name: 'API Monitor', status: 'idea', stars: 0 }], updatedAt: '2026-07-11T09:00:00Z' };
+const workspaceStorageKey = 'dev-utility-lab.workspaces.v1';
 
 function setStatus(message, kind = '') { status.textContent = message; dot.className = kind; }
 function parse() { try { return { value: JSON.parse(input.value) }; } catch (error) { const message = error.message.replace(/^Unexpected token/, 'Invalid character'); setStatus(message, 'error'); return { error }; } }
 function output(value, spacing = 2) { input.value = JSON.stringify(value, null, spacing); setStatus('Valid JSON', 'ok'); updateMatches(); updatePaths(value); }
 function download(content, name, type) { const url = URL.createObjectURL(new Blob([content], { type })); const link = document.createElement('a'); link.href = url; link.download = name; link.click(); URL.revokeObjectURL(url); }
+function getWorkspaces() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(workspaceStorageKey) || '[]');
+    return Array.isArray(saved) ? saved.filter((item) => item && typeof item.name === 'string' && typeof item.input === 'string' && typeof item.diffInput === 'string') : [];
+  } catch { return []; }
+}
+function storeWorkspaces(workspaces) { localStorage.setItem(workspaceStorageKey, JSON.stringify(workspaces)); }
+function renderWorkspaces(selectedName = '') {
+  const list = $('workspace-list'); const workspaces = getWorkspaces(); list.replaceChildren();
+  const placeholder = document.createElement('option'); placeholder.value = ''; placeholder.textContent = workspaces.length ? 'Choose a saved workspace' : 'No saved workspaces'; list.append(placeholder);
+  workspaces.forEach(({ name }) => { const option = document.createElement('option'); option.value = name; option.textContent = name; option.selected = name === selectedName; list.append(option); });
+}
+function refreshCurrentInput() {
+  updateMatches();
+  try { updatePaths(JSON.parse(input.value)); } catch { updatePaths(); }
+}
 function parseCsv(text) {
   const rows = [];
   let row = [];
@@ -87,6 +104,26 @@ $('minify').onclick = () => { const { value } = parse(); if (value !== undefined
 $('validate').onclick = () => { const { value } = parse(); if (value !== undefined) setStatus(`Valid JSON Â· ${Array.isArray(value) ? value.length + ' items' : 'object ready'}`, 'ok'); };
 $('clear').onclick = () => { input.value = ''; $('search').value = ''; setStatus('Ready for JSON'); updateMatches(); updatePaths(); input.focus(); };
 $('sample').onclick = () => output(sample);
+$('save-workspace').onclick = () => {
+  const name = $('workspace-name').value.trim();
+  if (!name) return setStatus('Name this workspace before saving', 'error');
+  const workspaces = getWorkspaces(); const workspace = { name, input: input.value, diffInput: $('diff-input').value, savedAt: Date.now() };
+  const existing = workspaces.findIndex((item) => item.name.toLowerCase() === name.toLowerCase());
+  if (existing >= 0) workspaces[existing] = workspace; else workspaces.unshift(workspace);
+  try { storeWorkspaces(workspaces); renderWorkspaces(name); setStatus(existing >= 0 ? `Updated local workspace "${name}"` : `Saved local workspace "${name}"`, 'ok'); }
+  catch { setStatus('Browser storage was unavailable', 'error'); }
+};
+$('load-workspace').onclick = () => {
+  const name = $('workspace-list').value; const workspace = getWorkspaces().find((item) => item.name === name);
+  if (!workspace) return setStatus('Choose a saved workspace first', 'error');
+  input.value = workspace.input; $('diff-input').value = workspace.diffInput; $('workspace-name').value = workspace.name; $('diff-results').replaceChildren(); $('diff-summary').textContent = 'Workspace loaded. Compare the two documents when ready.'; refreshCurrentInput(); setStatus(`Loaded local workspace "${workspace.name}"`, 'ok'); input.focus();
+};
+$('delete-workspace').onclick = () => {
+  const name = $('workspace-list').value;
+  if (!name) return setStatus('Choose a saved workspace to delete', 'error');
+  try { storeWorkspaces(getWorkspaces().filter((item) => item.name !== name)); renderWorkspaces(); $('workspace-name').value = ''; setStatus(`Deleted local workspace "${name}"`, 'ok'); }
+  catch { setStatus('Browser storage was unavailable', 'error'); }
+};
 $('copy').onclick = async () => { if (!input.value.trim()) return setStatus('Nothing to copy', 'error'); try { await navigator.clipboard.writeText(input.value); setStatus('Copied to clipboard', 'ok'); } catch { setStatus('Clipboard access was unavailable', 'error'); } };
 $('download').onclick = () => { const { value } = parse(); if (value !== undefined) { download(JSON.stringify(value, null, 2), 'data.json', 'application/json'); setStatus('Downloaded data.json', 'ok'); } };
 $('csv').onclick = () => { const { value } = parse(); if (!Array.isArray(value) || !value.every(item => item && typeof item === 'object' && !Array.isArray(item))) return setStatus('CSV needs an array of objects', 'error'); const fields = [...new Set(value.flatMap(Object.keys))]; const cell = (v) => `"${String(v ?? '').replaceAll('"', '""')}"`; const csv = [fields.join(','), ...value.map(row => fields.map(key => cell(row[key])).join(','))].join('\n'); download(csv, 'data.csv', 'text/csv'); setStatus(`Downloaded ${value.length} rows as CSV`, 'ok'); };
@@ -125,3 +162,4 @@ $('search').oninput = updateMatches; input.oninput = () => { setStatus('Editingâ
 input.onkeydown = (event) => { if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) { event.preventDefault(); $('format').click(); } };
 $('year').textContent = new Date().getFullYear();
 $('path-search').oninput = () => { const { value } = parse(); if (value !== undefined) updatePaths(value); };
+renderWorkspaces();

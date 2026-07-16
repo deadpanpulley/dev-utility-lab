@@ -29,6 +29,15 @@
         </div>
         <label class="sr-only" for="input">Paste JSON input</label>
         <textarea id="input" spellcheck="false" placeholder='Paste JSON here…&#10;&#10;Example: {"project":"hello","active":true}'></textarea>
+        <div class="workspace-save-bar" aria-label="Saved local workspaces">
+          <label for="workspace-name">Save this local workspace</label>
+          <input id="workspace-name" maxlength="60" autocomplete="off" placeholder="Workspace name" />
+          <button id="save-workspace" type="button">Save</button>
+          <label class="sr-only" for="workspace-list">Saved workspaces</label>
+          <select id="workspace-list" aria-label="Saved local workspaces"><option value="">No saved workspaces</option></select>
+          <button id="load-workspace" type="button">Load</button>
+          <button id="delete-workspace" class="danger-action" type="button">Delete</button>
+        </div>
         <div class="command-bar">
           <button id="format" class="primary">Format JSON <kbd>⌘↵</kbd></button>
           <button id="minify">Minify</button>

@@ -9,6 +9,7 @@ A privacy-first, browser-only JSON workspace. It is a portfolio project built in
 - Search keys and values
 - Explore and copy JSON paths, with safe bracket notation for unusual keys
 - Compare two JSON documents with added, removed, and changed paths
+- Save and reopen local JSON workspaces in this browser
 - Redact sensitive fields at any nesting level before sharing
 - Copy or download JSON
 - Convert an array of objects to CSV
@@ -30,6 +31,10 @@ Format, minify, load the sample, or convert CSV to JSON, then use **Explore path
 
 Paste one JSON document into the main editor and another into the **JSON diff** panel, then select **Compare JSON**. The local diff lists each added, removed, or changed path and shows a compact value preview. Comparison does not alter either document.
 
+## Saving local workspaces
+
+Give the current editor and JSON diff panel a name, then select **Save**. Saved workspaces remain only in this browser's local storage and include both editor contents, so they can also hold unfinished drafts. Saving a name again updates that workspace; select a workspace to load or delete it. Clearing browser site data removes saved workspaces.
+
 ## Run locally
 
 This first release is dependency-free. Open `index.html` in a browser, or serve the folder with any static-file server.
@@ -44,7 +49,7 @@ npx serve .
 - [x] Redact sensitive fields before sharing
 - [x] JSON path explorer
 - [x] CSV-to-JSON conversion
-- [ ] Saved local workspaces
+- [x] Saved local workspaces
 
 ## Contributing
 
