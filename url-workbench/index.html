@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Inspect and rebuild URLs locally in your browser." />
+    <title>URL Workbench</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <p class="eyebrow">Local-first developer utility</p>
+        <h1>URL Workbench</h1>
+        <p>Inspect a URL, edit its query parameters, and copy a safely rebuilt result. Nothing leaves your browser.</p>
+      </header>
+
+      <section class="card" aria-labelledby="source-label">
+        <label id="source-label" for="url-input">URL to inspect</label>
+        <div class="input-row">
+          <input id="url-input" type="url" spellcheck="false" autocomplete="off" placeholder="https://example.com/search?q=hello%20world" />
+          <button id="inspect-button" type="button">Inspect URL</button>
+        </div>
+        <p id="status" class="status" role="status" aria-live="polite">Enter an absolute URL to get started.</p>
+      </section>
+
+      <section id="details" class="details" hidden aria-label="URL details">
+        <div class="card components">
+          <h2>Components</h2>
+          <dl id="component-list"></dl>
+        </div>
+
+        <section class="card" aria-labelledby="query-heading">
+          <div class="section-heading">
+            <div>
+              <h2 id="query-heading">Query parameters</h2>
+              <p>Names and values are decoded for editing. Repeated names are kept.</p>
+            </div>
+            <button id="add-param-button" class="secondary" type="button">Add parameter</button>
+          </div>
+          <div id="param-list" class="param-list" aria-live="polite"></div>
+        </section>
+
+        <section class="card" aria-labelledby="result-heading">
+          <h2 id="result-heading">Rebuilt URL</h2>
+          <output id="rebuilt-url" class="result" aria-live="polite"></output>
+          <button id="copy-button" type="button">Copy rebuilt URL</button>
+        </section>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
