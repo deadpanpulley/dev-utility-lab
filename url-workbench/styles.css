@@ -24,6 +24,9 @@ dl { display: grid; grid-template-columns: max-content 1fr; gap: .6rem 1rem; mar
 dt { color: #52627b; } dd { margin: 0; overflow-wrap: anywhere; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
 .param-list { display: grid; gap: .65rem; }
 .param-row input { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+.param-row > input, .value-tools { flex: 1 1 0; }
+.value-tools { display: grid; grid-template-columns: 1fr auto auto; gap: .4rem; min-width: 0; }
+button.convert { padding: .5rem .6rem; background: #e7edf9; color: #213552; font-size: .8rem; }
 .result { display: block; overflow-wrap: anywhere; border: 1px solid #d9e1f0; background: #f7f9fd; border-radius: 8px; padding: .85rem; margin: 1rem 0; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; min-height: 3rem; }
-@media (prefers-color-scheme: dark) { :root { background: #101522; color: #e8edf8; } .card { background: #192133; border-color: #35425b; box-shadow: none; } input { border-color: #52617e; } .secondary, button.remove { background: #2d3c57; color: #e8edf8; } .result { background: #111827; border-color: #35425b; } .status, .section-heading p, dt { color: #b8c4d9; } }
-@media (max-width: 620px) { .shell { margin: 1.5rem auto; } .input-row, .section-heading, .param-row { flex-wrap: wrap; } .input-row button, .section-heading button { width: 100%; } .param-row input { flex: 1 1 42%; } }
+@media (prefers-color-scheme: dark) { :root { background: #101522; color: #e8edf8; } .card { background: #192133; border-color: #35425b; box-shadow: none; } input { border-color: #52617e; } .secondary, button.remove, button.convert { background: #2d3c57; color: #e8edf8; } .result { background: #111827; border-color: #35425b; } .status, .section-heading p, dt { color: #b8c4d9; } }
+@media (max-width: 620px) { .shell { margin: 1.5rem auto; } .input-row, .section-heading, .param-row { flex-wrap: wrap; } .input-row button, .section-heading button { width: 100%; } .param-row > input, .value-tools { flex-basis: 100%; } .value-tools { grid-template-columns: 1fr 1fr; } .value-tools input { grid-column: 1 / -1; } }

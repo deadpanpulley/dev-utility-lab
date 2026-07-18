@@ -22,7 +22,22 @@
     return url.href;
   }
 
-  window.URLWorkbench = { inspectUrl, rebuildUrl };
+  function base64UrlEncode(value) {
+    const bytes = new TextEncoder().encode(value);
+    let binary = "";
+    bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+
+  function base64UrlDecode(value) {
+    if (!/^[A-Za-z0-9_-]*$/.test(value) || value.length % 4 === 1) throw new Error("Enter valid URL-safe Base64.");
+    const padded = value.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - value.length % 4) % 4);
+    let binary;
+    try { binary = atob(padded); } catch { throw new Error("Enter valid URL-safe Base64."); }
+    return new TextDecoder("utf-8", { fatal: true }).decode(Uint8Array.from(binary, (character) => character.charCodeAt(0)));
+  }
+
+  window.URLWorkbench = { inspectUrl, rebuildUrl, base64UrlEncode, base64UrlDecode };
 
   const input = document.getElementById("url-input");
   const inspectButton = document.getElementById("inspect-button");
@@ -47,11 +62,23 @@
     nameInput.type = "text"; nameInput.value = name; nameInput.placeholder = "Parameter name"; nameInput.setAttribute("aria-label", "Parameter name");
     const valueInput = document.createElement("input");
     valueInput.type = "text"; valueInput.value = value; valueInput.placeholder = "Value"; valueInput.setAttribute("aria-label", "Parameter value");
+    const valueTools = document.createElement("div");
+    valueTools.className = "value-tools";
+    const encode = document.createElement("button");
+    encode.type = "button"; encode.className = "convert"; encode.textContent = "Base64 encode"; encode.setAttribute("aria-label", "Encode parameter value as URL-safe Base64");
+    const decode = document.createElement("button");
+    decode.type = "button"; decode.className = "convert"; decode.textContent = "Base64 decode"; decode.setAttribute("aria-label", "Decode parameter value from URL-safe Base64");
+    encode.addEventListener("click", () => { valueInput.value = base64UrlEncode(valueInput.value); renderResult(); setStatus("Parameter value encoded as URL-safe Base64."); });
+    decode.addEventListener("click", () => {
+      try { valueInput.value = base64UrlDecode(valueInput.value); renderResult(); setStatus("Parameter value decoded from URL-safe Base64."); }
+      catch (error) { setStatus(error.message, true); }
+    });
     const remove = document.createElement("button");
     remove.type = "button"; remove.className = "remove"; remove.textContent = "Remove"; remove.setAttribute("aria-label", "Remove parameter " + name);
     [nameInput, valueInput].forEach((field) => field.addEventListener("input", renderResult));
     remove.addEventListener("click", () => { row.remove(); renderResult(); });
-    row.append(nameInput, valueInput, remove);
+    valueTools.append(valueInput, encode, decode);
+    row.append(nameInput, valueTools, remove);
     paramList.append(row);
     return nameInput;
   }

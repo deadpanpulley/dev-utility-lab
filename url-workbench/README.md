@@ -8,6 +8,7 @@ A small, browser-only URL inspector for a common developer task: understanding a
 - Shows decoded query parameters for editing
 - Preserves repeated parameter names and URL fragments
 - Rebuilds correctly encoded URLs as you type
+- Converts individual query values to and from URL-safe Base64, including Unicode text
 - Copies the rebuilt URL when browser clipboard permission is available
 - Works entirely locally with no dependencies, network requests, or accounts
 
@@ -27,7 +28,7 @@ From the repository root:
 node url-workbench/test/app.test.cjs
 ```
 
-The tests cover URL component extraction, repeated parameters, encoding during rebuilding, fragments, and invalid protocol/input handling.
+The tests cover URL component extraction, repeated parameters, encoding during rebuilding, URL-safe Base64 conversion (including Unicode), fragments, and invalid protocol/input handling.
 
 ## License
 
